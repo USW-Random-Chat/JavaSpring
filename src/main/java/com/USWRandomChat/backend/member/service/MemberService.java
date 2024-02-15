@@ -20,6 +20,7 @@ import com.USWRandomChat.backend.security.jwt.repository.JwtRepository;
 import com.USWRandomChat.backend.security.jwt.service.JwtService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,6 +45,7 @@ public class MemberService {
     private final ProfileRepository profileRepository;
     private final EmailTokenRepository emailTokenRepository;
     private final JwtRepository jwtRepository;
+    private final JavaMailSender javaMailSender;
 
     // 회원가입
     public Member signUp(SignUpRequest request) {
@@ -67,6 +69,7 @@ public class MemberService {
         Member savedMemberEmail = memberRepository.findByEmail(member.getEmail());
 
         return savedMemberEmail;
+
     }
 
 
