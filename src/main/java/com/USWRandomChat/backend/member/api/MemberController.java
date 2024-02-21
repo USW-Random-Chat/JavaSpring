@@ -1,7 +1,6 @@
 package com.USWRandomChat.backend.member.api;
 
 import com.USWRandomChat.backend.emailAuth.service.EmailService;
-import com.USWRandomChat.backend.emailAuth.service.IdFindByEmailService;
 import com.USWRandomChat.backend.member.domain.Member;
 import com.USWRandomChat.backend.member.exception.CheckDuplicateNicknameException;
 import com.USWRandomChat.backend.member.exception.NicknameChangeNotAllowedException;
@@ -38,7 +37,6 @@ public class MemberController {
     private final ResponseService responseService;
     private final EmailService emailService;
     private final JwtService jwtService;
-    private final IdFindByEmailService idFindByEmailService;
 
     //회원가입
     @PostMapping(value = "/sign-up")
@@ -149,7 +147,7 @@ public class MemberController {
     //Id 찾기 로직: 이메일 인증된 회원만
     @PostMapping(value = "/find-Id")
     public ResponseEntity<Boolean> findId(@RequestParam String email) throws MessagingException {
-        return new ResponseEntity<>(idFindByEmailService.findById(email), HttpStatus.OK);
+        return new ResponseEntity<>(memberService.findById(email), HttpStatus.OK);
     }
 
     //임의의 데이터 넣기

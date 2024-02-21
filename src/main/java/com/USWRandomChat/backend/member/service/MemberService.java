@@ -3,6 +3,7 @@ package com.USWRandomChat.backend.member.service;
 import com.USWRandomChat.backend.emailAuth.repository.EmailTokenRepository;
 import com.USWRandomChat.backend.exception.ExceptionType;
 import com.USWRandomChat.backend.exception.errortype.AccountException;
+import com.USWRandomChat.backend.exception.errortype.MailException;
 import com.USWRandomChat.backend.member.domain.Member;
 import com.USWRandomChat.backend.member.exception.CheckDuplicateNicknameException;
 import com.USWRandomChat.backend.member.exception.NicknameChangeNotAllowedException;
@@ -21,15 +22,21 @@ import com.USWRandomChat.backend.security.jwt.service.JwtService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+
+import static com.USWRandomChat.backend.exception.ExceptionType.EMAIL_NOT_AUTHED;
+import static com.USWRandomChat.backend.exception.ExceptionType.SEND_MAIL_FAILED;
 
 @Service
 @Transactional
@@ -169,4 +176,34 @@ public class MemberService {
     public void deleteFromId(Long id) {
         memberRepository.deleteById(id);
     }
+
+    public boolean findById(String email) throws MessagingException {
+        Member findmember = memberRepository.findByEmail(email);
+
+        // 이메일에 해당하는 회원이 없을 때 예외 발생
+        if (findmember == null){
+            throw new AccountException(ExceptionType.BAD_CREDENTIALS);
+        }
+
+        // 이메일이 인증되지 않은 경우 예외를 던집니다.
+        if (!findmember.isEmailVerified()) {
+            throw new AccountException(EMAIL_NOT_AUTHED);
+        }
+
+        try {
+            //MimeMessage  생성
+            MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, false);
+            helper.setTo(findmember.getEmail() + "@suwon.ac.kr"); // 수신자 이메일 설정
+            helper.setSubject("수원대학교 SWCHAT의 아이디 찾기 위한 메일입니다."); // 이메일 제목
+            helper.setText("회원님의 아이디는 " + findmember.getAccount() + " 입니다."); // 이메일 내용 설정
+
+            javaMailSender.send(mimeMessage);
+            return true;
+        } catch (MessagingException e){
+            e.printStackTrace();
+            throw new MailException(SEND_MAIL_FAILED);
+        }
+    }
+
 }
