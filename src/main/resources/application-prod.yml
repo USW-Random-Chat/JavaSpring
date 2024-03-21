@@ -11,15 +11,15 @@ spring:
       on-profile: prod
 
   redis:
-    host: 0.0.0.0
+    host: redis
     port: 6379
 
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://43.202.91.160:3306/swChat?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
-    username: swchat
-    password: 1234
+    url: jdbc:mysql://localhost:3306/test?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: root
+    password: root
   thymeleaf:
     cache: false
 
