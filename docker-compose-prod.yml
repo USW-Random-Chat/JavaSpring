@@ -24,7 +24,7 @@ services:
       MYSQL_USER: suchat_user
       MYSQL_PASSWORD: 1234
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - mysql-data:/var/lib/mysql
     networks:
@@ -34,7 +34,7 @@ services:
     container_name: suchat-redis
     image: redis:alpine
     ports:
-      - "6379:6379"
+      - "6380:6379"
     networks:
       - app-network
 
