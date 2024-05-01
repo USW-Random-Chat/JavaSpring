@@ -1,9 +1,8 @@
 #log setting
 logging:
   level:
-    com:
-      USWRandomChat:
-        backend: debug
+    root: DEBUG
+
 
 #email url
 email:
@@ -25,19 +24,24 @@ spring:
       cache: false
 
   redis:
-    host: localhost
+    host: redis
     port: 6379
 
+#  datasource:
+#    url: jdbc:h2:tcp://localhost/~/swchat
+#    username: sa
+#    password:
+#    driver-class-name: org.h2.Driver
+
   datasource:
-    url: jdbc:h2:tcp://localhost/~/swchat
-    username: sa
-    password:
-    driver-class-name: org.h2.Driver
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://mysql:3306/suchat
+    username: suchat_user
+    password: 1234
 
   jpa:
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    show-sql: true
     hibernate:
       ddl-auto: create
-    properties:
-      hibernate:
-        #      show_sql: true
-        format_sql: true
+    generate-ddl: true

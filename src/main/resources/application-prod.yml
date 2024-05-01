@@ -3,7 +3,7 @@ logging:
   level:
     com:
       USWRandomChat:
-        backend: info
+        backend: INFO
 
 #email url
 email:
@@ -16,13 +16,13 @@ spring:
       on-profile: prod
 
   redis:
-    host: 0.0.0.0
+    host: redis
     port: 6379
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://43.202.91.160:3306/swChat?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
-    username: swchat
+    url: jdbc:mysql://mysql:3306/suchat
+    username: suchat_user
     password: 1234
 
   thymeleaf:
@@ -32,6 +32,9 @@ spring:
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
     open-in-view: false
     show-sql: true
+#    show-sql: false  # 운영 환경에서는 SQL 로깅 비활성화
     hibernate:
       ddl-auto: create
+#        ddl-auto: validate  # 운영 환경에서는 주로 validate 또는 none 사용
     generate-ddl: true
+#    generate-ddl: false  # 운영 환경에서는 DDL 생성 비활성화
