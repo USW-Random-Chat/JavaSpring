@@ -1,46 +1,46 @@
-version: '3.7'
+version: '3.7'  # Docker Compose 버전
 services:
-  app:
+  app:  # 스프링부트 애플리케이션
     container_name: suchat
-    build:
-      context: .
-      dockerfile: Dockerfile
+    build:  # 도커 이미지 빌드 설정
+      context: .  # Dockerfile이 위치한 디렉토리
+      dockerfile: Dockerfile  # 사용할 Dockerfile
     ports:
-      - "8080:80"  # 프로덕션에서는 80 포트로 리다이렉트
+      - "8080:80"  # 내부 8080 포트를 외부 8080 포트에 연결
     environment:
-      SPRING_PROFILES_ACTIVE: prod
+      SPRING_PROFILES_ACTIVE: prod  # 스프링 프로필을 'prod'로 설정
     depends_on:
       - mysql
       - redis
     networks:
-      - app-network
+      - app-network  # 네트워크 연결
 
-  mysql:
+  mysql:  # MySQL 데이터베이스
     container_name: suchat-mysql
-    image: mysql:5.7
+    image: mysql:5.7  # 사용할 MySQL 이미지
     environment:
       MYSQL_ROOT_PASSWORD: 1234
       MYSQL_DATABASE: suchat
       MYSQL_USER: suchat_user
       MYSQL_PASSWORD: 1234
     ports:
-      - "3307:3306"
+      - "3307:3306"  # 내부 3306 포트를 외부 3307 포트에 연결
     volumes:
-      - mysql-data:/var/lib/mysql
+      - mysql-data:/var/lib/mysql  # 데이터 보존을 위한 볼륨
     networks:
       - app-network
 
-  redis:
+  redis:  # Redis 서비스
     container_name: suchat-redis
-    image: redis:alpine
+    image: redis:alpine  # 경량의 Redis 이미지 사용
     ports:
-      - "6380:6379"
+      - "6380:6379"  # 내부 6379 포트를 외부 6380 포트에 연결
     networks:
       - app-network
 
 networks:
-  app-network:
-    driver: bridge
+  app-network:  # 사용할 네트워크 정의
+    driver: bridge  # 네트워크 드라이버 설정
 
 volumes:
-  mysql-data:
+  mysql-data:  # MySQL 데이터 볼륨

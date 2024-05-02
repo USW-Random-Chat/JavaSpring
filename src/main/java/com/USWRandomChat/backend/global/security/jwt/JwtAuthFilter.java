@@ -45,7 +45,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private boolean isSkippedPath(HttpServletRequest request) {
         // 검증하지 않을 경로 패턴들
         String[] skipPaths = {
-                "/open/**"
+                "/open/**",
+                "/chat/**"
         };
 
         for (String path : skipPaths) {
