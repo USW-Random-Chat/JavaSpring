@@ -21,10 +21,10 @@ services:
     container_name: suchat-mysql
     image: mysql:5.7  # 사용할 MySQL 이미지
     environment:
-      MYSQL_ROOT_PASSWORD: 1234
-      MYSQL_DATABASE: suchat
-      MYSQL_USER: suchat_user
-      MYSQL_PASSWORD: 1234
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     ports:
       - "3307:3306"  # 내부 3306 포트를 외부 3307 포트에 연결
     volumes:
