@@ -69,6 +69,12 @@ dependencies {
 	//mapstruct
 	implementation 'org.mapstruct:mapstruct:1.5.3.Final'
 	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'
+
+	//.env
+	implementation 'me.paulschwarz:spring-dotenv:2.5.4'
+
+	//aws
+	implementation 'com.amazonaws:aws-java-sdk-ssm:1.11.749'
 }
 
 tasks.named('bootBuildImage') {
