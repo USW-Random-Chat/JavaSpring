@@ -2,7 +2,7 @@ package com.USWRandomChat.backend.global.security.jwt.service;
 
 import com.USWRandomChat.backend.global.exception.ExceptionType;
 import com.USWRandomChat.backend.global.exception.errortype.AccountException;
-import com.USWRandomChat.backend.global.exception.errortype.TokenException;
+import com.USWRandomChat.backend.global.exception.errortype.RefreshTokenException;
 import com.USWRandomChat.backend.global.security.domain.Authority;
 import com.USWRandomChat.backend.global.security.jwt.JwtProvider;
 import com.USWRandomChat.backend.global.security.jwt.dto.TokenDto;
@@ -28,15 +28,15 @@ public class JwtService {
     private final MemberRepository memberRepository;
     private final JwtProvider jwtProvider;
 
-    //access, refresh Token 재발급
+    //토큰 재발급
     @Transactional(readOnly = true)
-    public TokenDto renewToken(HttpServletRequest request, HttpServletResponse response) throws TokenException, AccountException {
+    public TokenDto renewToken(HttpServletRequest request, HttpServletResponse response) throws RefreshTokenException, AccountException {
+        //쿠키에서 리프레시 토큰 추출
         String refreshToken = jwtProvider.resolveRefreshToken(request);
 
         //리프레시 토큰 유효성 검사
-        jwtProvider.validateRefreshToken(refreshToken);
         if (!jwtProvider.validateRefreshToken(refreshToken)) {
-            throw new TokenException(ExceptionType.REFRESH_TOKEN_EXPIRED);
+            throw new RefreshTokenException(ExceptionType.REFRESH_TOKEN_EXPIRED);
         }
 
         String account = fetchAccountFromRefreshToken(refreshToken);
@@ -49,15 +49,19 @@ public class JwtService {
         String newAccessToken = jwtProvider.createAccessToken(member.getAccount(), roleNames);
         jwtProvider.addAccessTokenToHeader(response, newAccessToken);
 
-        //리프레시 토큰 재갱신
+        //기존 리프레시 토큰 삭제 및 리프레시 토큰 재갱신
         String newRefreshToken = replaceRefreshToken(response, refreshToken, member.getAccount());
 
         return new TokenDto(newAccessToken, newRefreshToken);
     }
 
     //레디스에서 함께 저장된 계정 조회
-    private String fetchAccountFromRefreshToken(String refreshToken) throws TokenException {
-        return redisTemplate.opsForValue().get(JwtProvider.REFRESH_TOKEN_PREFIX + refreshToken);
+    private String fetchAccountFromRefreshToken(String refreshToken) throws RefreshTokenException {
+        String account = redisTemplate.opsForValue().get(JwtProvider.REFRESH_TOKEN_PREFIX + refreshToken);
+        if (account == null) {
+            throw new RefreshTokenException(ExceptionType.INVALID_REFRESH_TOKEN);
+        }
+        return account;
     }
 
     //권한 확인
@@ -67,10 +71,13 @@ public class JwtService {
                 .collect(Collectors.toList());
     }
 
-    //리프레시 토큰 재갱신
+    //기존 리프레시 토큰 삭제 및 리프레시 토큰 재갱신
     private String replaceRefreshToken(HttpServletResponse response, String oldRefreshToken, String account) {
-        String newRefreshToken = jwtProvider.createRefreshToken();
+        //기존 리프레시 토큰 삭제
         redisTemplate.delete(JwtProvider.REFRESH_TOKEN_PREFIX + oldRefreshToken);
+
+        //새로운 리프레시 토큰 생성
+        String newRefreshToken = jwtProvider.createRefreshToken();
         jwtProvider.addCookieAndSaveTokenInRedis(response, newRefreshToken, account);
         return newRefreshToken;
     }
