@@ -23,31 +23,32 @@ public class ChatPreHandler implements ChannelInterceptor {
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         try {
-            log.info("stomp intercepter 실행");
+            log.info("STOMP Interceptor 실행");
             StompHeaderAccessor headerAccessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
 
             assert headerAccessor != null;
-            String authorizationHeader = String.valueOf(headerAccessor.getNativeHeader("Authorization"));
+            String authorizationHeader = headerAccessor.getFirstNativeHeader("Authorization");
 
             StompCommand command = headerAccessor.getCommand();
 
             assert command != null;
-            if(command.equals(StompCommand.UNSUBSCRIBE) || command.equals(StompCommand.MESSAGE) ||
-                    command.equals(StompCommand.CONNECTED) || command.equals(StompCommand.SEND)){
+            if (command.equals(StompCommand.UNSUBSCRIBE) || command.equals(StompCommand.MESSAGE) ||
+                    command.equals(StompCommand.CONNECTED) || command.equals(StompCommand.SEND)) {
                 return message;
-            }
-            else if (command.equals(StompCommand.ERROR)) {
+            } else if (command.equals(StompCommand.ERROR)) {
                 throw new MessageDeliveryException("error");
             }
 
             if (authorizationHeader == null) {
-                log.info("chat header가 없는 요청입니다.");
-                throw new MalformedJwtException("jwt");
+                log.info("Authorization 헤더가 없는 요청입니다.");
+                throw new MalformedJwtException("JWT가 없습니다.");
             }
 
             // JWT 검증
             String accessToken = authorizationHeader.replace("Bearer ", "");
-            jwtProvider.validateAccessToken(accessToken);
+            if (!jwtProvider.validateAccessToken(accessToken)) {
+                throw new MalformedJwtException("JWT 검증 실패");
+            }
 
             // Principal 설정
             String username = jwtProvider.getAccount(accessToken);
@@ -55,7 +56,7 @@ public class ChatPreHandler implements ChannelInterceptor {
 
         } catch (Exception e) {
             log.error("JWT 에러: ", e);
-            throw new MalformedJwtException("jwt");
+            throw new MalformedJwtException("JWT 검증 실패");
         }
         return message;
     }

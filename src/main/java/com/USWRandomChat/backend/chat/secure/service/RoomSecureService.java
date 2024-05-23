@@ -93,7 +93,7 @@ public class RoomSecureService {
     }
 
     // 룸 Id 업데이트
-    private void updateMemberRoomId(String account, String roomId) {
+    public void updateMemberRoomId(String account, String roomId) {
         Member member = findMemberByAccount(account);
         Profile profile = findProfileByMember(member);
 
@@ -110,5 +110,12 @@ public class RoomSecureService {
     private Profile findProfileByMember(Member member) {
         return profileRepository.findByMember(member)
                 .orElseThrow(() -> new ProfileException(ExceptionType.PROFILE_NOT_EXISTS));
+    }
+    
+    //테스트 용도
+    public String checkMemberRoomId(String account) {
+        Member member = findMemberByAccount(account);
+        Profile profile = findProfileByMember(member);
+        return profile.getRoomId();
     }
 }
