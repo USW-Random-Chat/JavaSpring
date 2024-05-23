@@ -45,14 +45,14 @@ public class RoomSecureService {
     // 매칭 큐에 참가하는 메서드
     public void addToMatchingQueue(String account) {
         matchQueue.add(MATCH_QUEUE, account, System.currentTimeMillis());
-        messagingTemplate.convertAndSendToUser(account, "/queue/match", "매칭 요청이 접수되었습니다.");
+        messagingTemplate.convertAndSend("/queue/match/in/" + account, "매칭 요청이 접수되었습니다.");
         performMatchingAsync(account);
     }
 
     // 매칭을 취소하는 메서드
     public void removeCancelParticipants(String account) {
         matchQueue.remove(MATCH_QUEUE, account);
-        messagingTemplate.convertAndSendToUser(account, "/queue/match", "매칭이 취소되었습니다.");
+        messagingTemplate.convertAndSend("/queue/match/cancel/" + account, "매칭이 취소되었습니다.");
         log.info("매칭 취소 회원: {} 큐에서 제거", account);
     }
 
@@ -88,7 +88,7 @@ public class RoomSecureService {
 
     // 매칭된 사용자에게 웹소켓 메시지 전송
     private void sendMatchingNotification(String account, String chatRoomId) {
-        messagingTemplate.convertAndSendToUser(account, "/queue/match", "매칭이 완료되었습니다. 채팅방 ID: " + chatRoomId);
+        messagingTemplate.convertAndSend("/queue/match/in/" + account, "매칭이 완료되었습니다. 채팅방 ID: " + chatRoomId);
         log.info(account + " 사용자에게 매칭 메시지 전달 성공");
     }
 
