@@ -27,7 +27,7 @@ import java.util.concurrent.CompletableFuture;
 @RequiredArgsConstructor
 @Slf4j
 public class RoomSecureService {
-    private static final String MATCH_QUEUE = "MatchQueue"; //매칭 큐의 Redis key
+    private static final String MATCH_QUEUE = "MatchQueue"; // 매칭 큐의 Redis key
 
     private final ProfileRepository profileRepository;
     private final MemberRepository memberRepository;
@@ -42,25 +42,26 @@ public class RoomSecureService {
         matchQueue = matchRedisTemplate.opsForZSet();
     }
 
-    //매칭 큐에 참가하는 메서드
+    // 매칭 큐에 참가하는 메서드
     public void addToMatchingQueue(String account) {
         matchQueue.add(MATCH_QUEUE, account, System.currentTimeMillis());
+        messagingTemplate.convertAndSendToUser(account, "/queue/match", "매칭 요청이 접수되었습니다.");
         performMatchingAsync(account);
     }
 
-    //매칭을 취소하는 메서드
+    // 매칭을 취소하는 메서드
     public void removeCancelParticipants(String account) {
         matchQueue.remove(MATCH_QUEUE, account);
         messagingTemplate.convertAndSendToUser(account, "/queue/match", "매칭이 취소되었습니다.");
         log.info("매칭 취소 회원: {} 큐에서 제거", account);
     }
 
-    //비동기 매칭
+    // 비동기 매칭
     @Async
     public CompletableFuture<String> performMatchingAsync(String account) {
         CompletableFuture<String> future = new CompletableFuture<>();
 
-        //매칭 큐에 다른 사용자가 있는지 확인하고 매칭 처리
+        // 매칭 큐에 다른 사용자가 있는지 확인하고 매칭 처리
         if (matchQueue.size(MATCH_QUEUE) > 1) {
             String participant1 = Objects.requireNonNull(matchQueue.range(MATCH_QUEUE, 0, 0)).iterator().next();
             String participant2 = Objects.requireNonNull(matchQueue.range(MATCH_QUEUE, 1, 1)).iterator().next();
@@ -69,7 +70,7 @@ public class RoomSecureService {
             updateMemberRoomId(participant1, chatRoomId);
             updateMemberRoomId(participant2, chatRoomId);
 
-            //웹소켓을 통해 메시지 전송
+            // 웹소켓을 통해 메시지 전송
             sendMatchingNotification(participant1, chatRoomId);
             sendMatchingNotification(participant2, chatRoomId);
 
@@ -85,13 +86,13 @@ public class RoomSecureService {
         return future;
     }
 
-    //매칭된 사용자에게 웹소켓 메시지 전송
+    // 매칭된 사용자에게 웹소켓 메시지 전송
     private void sendMatchingNotification(String account, String chatRoomId) {
         messagingTemplate.convertAndSendToUser(account, "/queue/match", "매칭이 완료되었습니다. 채팅방 ID: " + chatRoomId);
         log.info(account + " 사용자에게 매칭 메시지 전달 성공");
     }
 
-    //룸 Id 업데이트
+    // 룸 Id 업데이트
     private void updateMemberRoomId(String account, String roomId) {
         Member member = findMemberByAccount(account);
         Profile profile = findProfileByMember(member);
