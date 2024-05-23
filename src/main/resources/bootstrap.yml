@@ -1,0 +1,15 @@
+spring:
+  profiles:
+    active: prod
+
+  application:
+    name: suchat
+
+  cloud:
+    aws:
+      stack:
+        auto: false
+      region:
+        static: ap-northeast-2
+    config:
+      import: optional:aws-paramstore:/suchat/

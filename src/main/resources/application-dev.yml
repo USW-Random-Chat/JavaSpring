@@ -1,20 +1,7 @@
-#log setting
-logging:
-  level:
-    com:
-      USWRandomChat:
-        backend: debug
-
-#email url
-email:
-  config:
-    baseUrl: "http://localhost:8080"
-
 spring:
   config:
     activate:
       on-profile: dev
-
   #static 파일을 개발할때 서버 재시작하지 않고 수정한 내용 반영
   devtools:
     livereload:
@@ -41,3 +28,15 @@ spring:
       hibernate:
         #      show_sql: true
         format_sql: true
+
+#log setting
+logging:
+  level:
+    com:
+      USWRandomChat:
+        backend: debug
+
+#email url
+email:
+  config:
+    baseUrl: "http://localhost:8080"

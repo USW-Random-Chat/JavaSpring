@@ -7,8 +7,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: ${mail.username}
-    password: ${mail.password}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
     properties:
       mail:
         smtp:
@@ -27,11 +27,15 @@ spring:
     password: ""
 #  profiles:
 #    active: local
-
+#jwt.secret.key 값
+jwt:
+  secret:
+    key: ${JWT_SECRET_KEY}
 # 인증번호 4자리 설정
 verification:
   code:
     length: 4
+
 logging.level:
   org.hibernate.SQL: debug
 #  p6spygotj

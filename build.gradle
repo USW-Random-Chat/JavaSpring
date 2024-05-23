@@ -74,7 +74,7 @@ dependencies {
 	implementation 'me.paulschwarz:spring-dotenv:2.5.4'
 
 	//aws
-	implementation 'com.amazonaws:aws-java-sdk-ssm:1.11.749'
+	implementation 'io.awspring.cloud:spring-cloud-starter-aws-parameter-store'
 }
 
 tasks.named('bootBuildImage') {

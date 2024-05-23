@@ -1,15 +1,3 @@
-#log setting
-logging:
-  level:
-    com:
-      USWRandomChat:
-        backend: info
-
-#email url
-email:
-  config:
-    baseUrl: "http://43.202.91.160:8080"
-
 spring:
   config:
     activate:
@@ -52,3 +40,15 @@ spring:
     hibernate:
       ddl-auto: create
     generate-ddl: true
+
+#log setting
+logging:
+  level:
+    com:
+      USWRandomChat:
+        backend: info
+
+#email url
+email:
+  config:
+    baseUrl: "http://43.202.91.160:8080"
