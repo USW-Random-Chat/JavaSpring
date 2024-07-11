@@ -1,5 +1,6 @@
 package com.USWRandomChat.backend.chat.secure.api;
 
+import com.USWRandomChat.backend.chat.domain.Message;
 import com.USWRandomChat.backend.chat.dto.MessageResponse;
 import com.USWRandomChat.backend.chat.dto.MultiResponseDto;
 import com.USWRandomChat.backend.chat.dto.PageInfo;
@@ -46,7 +47,7 @@ public class ChatSecureController {
         redisTemplate.convertAndSend(channelTopic.getTopic(), pubMessage);
         log.info("레디스 서버에 메시지 전송");
 
-        chatSecureService.saveMessage(messageRequest, roomId);
+        chatSecureService.CachedMessage(messageRequest, Long.valueOf(roomId));
     }
 
     @GetMapping("/chat/message/{room-id}")
@@ -55,10 +56,10 @@ public class ChatSecureController {
                                       @Positive @RequestParam(defaultValue = "10") int size){
 
         //해당 채팅방의 메세지 가져오기
-        Page<MessageRequest> messages = chatSecureService.findMessages(roomId, page, size);
+        Page<Message> messages = chatSecureService.findMessages(roomId, page, size);
         PageInfo pageInfo = new PageInfo(page, size, (int)messages.getTotalElements(), messages.getTotalPages());
 
-        List<MessageRequest> messageList = messages.getContent();
+        List<Message> messageList = messages.getContent();
         List<MessageResponse> messageResponses = mapper.messagesToMessageResponseDtos(messageList);
 
         return new ResponseEntity<>(new MultiResponseDto<>(messageResponses, pageInfo), HttpStatus.OK);

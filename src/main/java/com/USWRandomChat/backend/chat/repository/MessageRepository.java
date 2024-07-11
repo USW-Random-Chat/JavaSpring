@@ -12,5 +12,6 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     Optional<Message> findTopByRoomIdOrderByMessageNumberDesc(String roomId);
     Page<MessageRequest> findByRoomId(Pageable pageable, Profile profile);
 
+    Page<Message> findAllByRoomIdOrderBySendTimeDesc(Profile profile, Pageable pageable);
     void deleteByRoomId(String roomId);
 }

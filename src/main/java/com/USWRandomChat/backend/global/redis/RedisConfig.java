@@ -1,5 +1,7 @@
 package com.USWRandomChat.backend.global.redis;
 
+import com.USWRandomChat.backend.chat.dto.MessageRequest;
+import com.USWRandomChat.backend.chat.dto.MessageResponse;
 import com.USWRandomChat.backend.chat.secure.service.RedisSubscriber;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -7,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
+import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
@@ -96,5 +99,14 @@ public class RedisConfig {
         chatRedisTemplate.setKeySerializer(new StringRedisSerializer());
         chatRedisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(String.class));
         return chatRedisTemplate;
+    }
+
+    @Bean(name = "redisTemplateMessage")
+    public RedisTemplate<String, Message> redisTemplateMessage(RedisConnectionFactory connectionFactory) {
+        RedisTemplate<String, Message> redisTemplateMessage = new RedisTemplate<>();
+        redisTemplateMessage.setConnectionFactory(connectionFactory);
+        redisTemplateMessage.setKeySerializer(new StringRedisSerializer());
+        redisTemplateMessage.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+        return redisTemplateMessage;
     }
 }

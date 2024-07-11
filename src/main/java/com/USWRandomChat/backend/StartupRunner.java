@@ -1,5 +1,6 @@
 package com.USWRandomChat.backend;
 
+import com.USWRandomChat.backend.chat.secure.service.ChatSecureService;
 import com.USWRandomChat.backend.email.service.EmailAuthSchedulerService;
 import com.USWRandomChat.backend.member.domain.MemberTemp;
 import com.USWRandomChat.backend.member.dto.SignUpRequest;
@@ -13,10 +14,10 @@ import org.springframework.stereotype.Component;
 public class StartupRunner implements CommandLineRunner {
 
     private final EmailAuthSchedulerService schedulerService;
-    private final MemberOpenService memberOpenService;
-
+    private final ChatSecureService chatSecureService;
     @Override
     public void run(String... args) {
         schedulerService.removeMember();
+        chatSecureService.initMessage();
     }
 }
